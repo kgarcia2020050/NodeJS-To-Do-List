@@ -2,7 +2,7 @@ const { off } = require("../models/Listas");
 const Listas = require("../models/Listas");
 
 function verTareas(req, res) {
-  Listas.find((error, listadoTareas) => {
+  Listas.find({idUsuario:req.params.ID},(error, listadoTareas) => {
     if (error)
       return res.status(404).send({ Error: "Error al cargar las tareas." });
     if (!listadoTareas)
@@ -13,10 +13,12 @@ function verTareas(req, res) {
 
 function nuevaTarea(req, res) {
   var datos = req.body;
+
   if (datos.nombre || datos.descripcion) {
     var modeloListas = new Listas();
     modeloListas.nombre = datos.nombre;
     modeloListas.descripcion = datos.descripcion;
+    modeloListas.idUsuario=req.params.ID;
     modeloListas.save((error, newTask) => {
       if (error) return res.status(404).send({ Error: "Ocurrio un error." });
       if (!newTask)
@@ -66,7 +68,6 @@ function eliminarTarea(req,res){
   Listas.findByIdAndDelete({_id:req.params.ID},(error,tareaBorrada) => {
     if(error) return res.status(404).send({Error:"Error al eliminar la tarea."})
     if(!tareaBorrada)return res.status(500).send({Error:"No se pudo eliminar la tarea."})
-    return res.status(200).send({Tarea_borrada: tareaBorrada})
   })
 }
 
